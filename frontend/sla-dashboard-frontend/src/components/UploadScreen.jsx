@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
-
+import { requestPresignedUpload, putFileToS3 } from '../api';
 const MAX_FILE_BYTES = 50 * 1024 * 1024; // 50MB
 
 function UploadScreen({ onDone }) {
@@ -39,6 +39,15 @@ function UploadScreen({ onDone }) {
     setPhase('uploading');
 
     //API Call
+    try {
+      const { uploadUrl, uploadRunId } = await requestPresignedUpload(file.name);
+      await putFileToS3(uploadUrl, file);
+      setPhase('processing');
+      setPhase('done');
+    } catch (err) {
+      setError(err.message || 'Something went wrong.');
+      setPhase('error');
+    }
 
   }, []);
 
@@ -75,6 +84,36 @@ function UploadScreen({ onDone }) {
           <p>
             {phase === 'uploading' ? `Uploading ${fileName}…` : `Parsing and validating ${fileName}…`}
           </p>
+        </div>
+      )}
+
+      {phase === 'done' && summary && (
+        <div className="status-card success">
+          <h2>Upload complete</h2>
+          <ul className="summary-list">
+            <li><strong>{summary.total_rows}</strong> rows read</li>
+            <li><strong>{summary.inserted_rows}</strong> loaded</li>
+            <li><strong>{summary.duplicate_rows}</strong> exact duplicates dropped</li>
+            <li><strong>{summary.conflicting_rows}</strong> conflicting duplicates resolved</li>
+            <li><strong>{summary.rejected_rows}</strong> rows rejected</li>
+          </ul>
+          {summary.rejected_rows > 0 && (
+            <details className="rejected-reasons">
+              <summary>Why rows were rejected</summary>
+              <pre>{JSON.stringify(summary.rejected_reasons, null, 2)}</pre>
+            </details>
+          )}
+          <div className="button-row">
+            <button onClick={() => onDone(summary)}>View dashboard →</button>
+            <button className="secondary" onClick={reset}>Upload another file</button>
+          </div>
+        </div>
+      )}
+
+      {phase === 'error' && error && (
+        <div className="status-card error">
+          <p className="error-text">{error}</p>
+          <button onClick={reset}>Try again</button>
         </div>
       )}
 

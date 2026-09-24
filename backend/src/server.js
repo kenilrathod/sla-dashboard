@@ -4,6 +4,9 @@ require('dotenv').config()
 
 const {pool} = require('./db')
 
+//Router File
+const signedUrl = require('./routes/signedUrl')
+
 const app = express()
 const PORT = process.env.PORT || 4000
 // Todo
@@ -11,6 +14,7 @@ app.use(cors({origin:'*'}))
 app.use(express.json())
 
 //Router
+app.use("/uploads", signedUrl)
 
 // 404
 app.use((req,res) => {
