@@ -1,3 +1,9 @@
+./backend/node_modules
+./frontend/sla-dashboard-frontend/node_modules
+./backend/.env
+./frontend/sla-dashboard-frontend/node_modules/.env
+
+
 # Logs
 logs
 *.log
