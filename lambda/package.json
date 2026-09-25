@@ -1,0 +1,17 @@
+{
+  "name": "lambda",
+  "version": "1.0.0",
+  "description": "\"Lambda Function to process the uploaded csv file \"",
+  "license": "ISC",
+  "author": "Kenil Rathod",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1140.0",
+    "csv-parse": "^7.0.2",
+    "pg": "^8.23.0"
+  }
+}

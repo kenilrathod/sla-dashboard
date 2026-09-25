@@ -1,6 +1,8 @@
 import { useCallback, useRef, useState } from 'react';
-import { requestPresignedUpload, putFileToS3 } from '../api';
+import { requestPresignedUpload, putFileToS3, getUploadStatus } from '../api';
 const MAX_FILE_BYTES = 50 * 1024 * 1024; // 50MB
+const POLL_INTERVAL_MS = 2000
+const POLL_TIMEOUT_MS = 2 * 60 * 1000
 
 function UploadScreen({ onDone }) {
   const [phase, setPhase] = useState('idle')
@@ -43,6 +45,14 @@ function UploadScreen({ onDone }) {
       const { uploadUrl, uploadRunId } = await requestPresignedUpload(file.name);
       await putFileToS3(uploadUrl, file);
       setPhase('processing');
+
+      const result = await pollUntilDone(uploadRunId);
+      if (result.status === 'failed') {
+        setError(result.error_message || 'Processing failed.');
+        setPhase('error');
+        return;
+      }
+      setSummary(result);      
       setPhase('done');
     } catch (err) {
       setError(err.message || 'Something went wrong.');
@@ -122,3 +132,17 @@ function UploadScreen({ onDone }) {
 }
 
 export default UploadScreen
+
+export async function pollUntilDone(uploadRunId) {
+  const start = Date.now()
+  while(Date.now() - start < POLL_TIMEOUT_MS) {
+    const status = await getUploadStatus(uploadRunId)
+    if( status.status == "completed" || status.status == "failed") return status
+    await delay(POLL_INTERVAL_MS)
+  }
+  throw new Error('Processing is taking longer than expected. Check back on the dashboard shortly.');
+}
+
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve,ms))
+}

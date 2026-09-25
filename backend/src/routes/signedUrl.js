@@ -69,6 +69,33 @@ router.post("/presign", async(req,res) => {
     }
 })
 
+router.get("/:uploadRunId/status", async(req,res) => {
+    try {
+        let uploadRunId = req.params?.uploadRunId
+        if(uploadRunId.length != 36) {
+            return res.status(400).json({
+                error: "Invalid upload id."
+            })
+        }
+
+        const {rows} = await pool.query(`SELECT * FROM upload_runs WHERE id = $1`,[uploadRunId])
+
+        if (rows.length === 0) {
+            return res.status(404).json({
+                error: "Upload not found."
+            });
+        }
+        console.log(rows)
+        return res.status(200).json(rows[0]);
+
+    } catch (error) {
+        console.log("Upload status error ",error)
+        return res.status(500).json({
+            error: "Could not fetch upload status."
+        })
+    }
+})
+
 module.exports = router
 
 

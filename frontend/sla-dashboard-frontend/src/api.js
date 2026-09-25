@@ -33,3 +33,8 @@ export async function putFileToS3(uploadUrl, file) {
     throw new Error(`Upload to storage failed (HTTP ${res.status}). Please retry.`);
   }
 }
+
+export async function getUploadStatus(uploadRunId) {
+  const status = await fetch(`${API_ENDPOINT}/uploads/${uploadRunId}/status`)
+  return asJson(status);
+}
