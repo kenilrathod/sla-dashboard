@@ -6,6 +6,9 @@ const {pool} = require('./db')
 
 //Router File
 const signedUrl = require('./routes/signedUrl')
+const statsRoute = require('./routes/stats');
+const logsRoute = require('./routes/logs');
+const servicesRoute = require('./routes/services');
 
 const app = express()
 const PORT = process.env.PORT || 4000
@@ -15,6 +18,9 @@ app.use(express.json())
 
 //Router
 app.use("/uploads", signedUrl)
+app.use('/api/stats', statsRoute);
+app.use('/api/logs', logsRoute);
+app.use('/api/services', servicesRoute);
 
 // 404
 app.use((req,res) => {
