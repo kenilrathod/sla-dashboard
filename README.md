@@ -285,13 +285,13 @@ These percentile values help identify slow requests that may be hidden by averag
 Frontend:
 
 ```text
-http://sla-dashboard-frontend.s3-website-ap-southeast-2.amazonaws.com
+http://sla-dashboard-frontend.s3-website-ap-southeast-2.amazonaws.com/
 ```
 
 Backend API:
 
 ```text
-http://csv-processor-backend-env.eba-fwj3utvk.ap-southeast-2.elasticbeanstalk.com
+http://csv-processor-backend-env-1.eba-fwj3utvk.ap-southeast-2.elasticbeanstalk.com/ 
 ```
 
 ## Run locally
